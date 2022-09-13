@@ -19,7 +19,11 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 	if err != nil {
 		panic(err)
 	}
-	db.Create(&gormmodel.Diary{Userid: input.UserID, Word: input.Word, Imageurl: input.Imageurl})
+	if err := db.Create(&gormmodel.Diary{Userid: input.UserID, Word: input.Word, Imageurl: input.Imageurl}).Error;
+	err != nil{
+		//エラーハンドリング
+		fmt.Printf("diary create Error!!!! err:%v\n", err)
+	}
 
 	return &model.Diary{
 		Userid:   input.UserID,
@@ -30,7 +34,24 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input *model.NewUser) (*model.User, error) {
-	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+	db, err := client.GetDatabase()
+	if err != nil {
+		panic(err)
+	}
+	if err := db.Create(&gormmodel.User{ID: input.UserID, Name: input.Name}).Error
+		err != nil{
+			//エラーハンドリング
+			fmt.Printf("user create Error!!!! err:%v\n", err)
+			return &model.User{
+				ID:   input.UserID,
+				Name: input.Name,
+			}, err
+		}
+
+	return &model.User{
+		ID:   input.UserID,
+		Name: input.Name,
+	}, err
 }
 
 // Diary is the resolver for the diary field.
@@ -43,12 +64,46 @@ func (r *queryResolver) Diary(ctx context.Context, argument *string) ([]*model.D
 	var query = argument
 	var diary []*model.Diary
 	if argument != nil {
-		db.First(&diary, "userid = ?", query)
+		if err := db.First(&diary, "userid = ?", query).Error;
+		err != nil{
+			//エラーハンドリング
+			fmt.Printf("db select Error!!!! err:%v\n", err)
+		}
+		return diary, err
 	} else {
-		db.First(&diary)
+		if err := db.First(&diary).Error;
+		err != nil{
+			//エラーハンドリング
+			fmt.Printf("db select Error!!!! err:%v\n", err)
+		}
+		return diary, err
+	}
+}
+
+// User is the resolver for the User field.
+func (r *queryResolver) User(ctx context.Context, argument *string) ([]*model.User, error) {
+	db, err := client.GetDatabase()
+	if err != nil {
+		panic(err)
+	}
+	var query = argument
+	var user []*model.User
+	if argument != nil {
+		if err := db.First(&user, "id = ?", query).Error;
+		err != nil{
+			//エラーハンドリング
+			fmt.Printf("db select Error!!!! err:%v\n", err)
+		}
+		return user, err
+	} else {
+		if err := db.First(&user).Error;
+		err != nil{
+			//エラーハンドリング
+			fmt.Printf("db select Error!!!! err:%v\n", err)
+		}
+		return user, err
 	}
 
-	return diary, err
 }
 
 // Mutation returns generated.MutationResolver implementation.
