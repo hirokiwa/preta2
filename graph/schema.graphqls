@@ -1,0 +1,30 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+scalar Timestamp
+
+type Diary {
+  id: ID!
+  text: String
+  imageurl:String!
+  userid: String!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  diary: [Diary!]!
+}
+
+input NewDiary {
+  text: String!
+  userId: String!
+}
+
+type Mutation {
+  createDiary(input: NewDiary!): Diary!
+}
