@@ -3,15 +3,23 @@
 package model
 
 type Diary struct {
-	ID       string  `json:"id"`
-	Text     *string `json:"text"`
-	Imageurl string  `json:"imageurl"`
-	Userid   string  `json:"userid"`
+	ID        string  `json:"ID"`
+	Word      *string `json:"Word"`
+	Imageurl  string  `json:"imageurl"`
+	Userid    string  `json:"userid"`
+	CreatedAt string  `json:"CreatedAt"`
+	UpdatedAt string  `json:"UpdatedAt"`
 }
 
 type NewDiary struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	Word     *string `json:"Word"`
+	UserID   string  `json:"userId"`
+	Imageurl string  `json:"imageurl"`
+}
+
+type NewUser struct {
+	UserID string `json:"UserId"`
+	Name   string `json:"name"`
 }
 
 type User struct {

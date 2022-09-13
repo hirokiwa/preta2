@@ -9,23 +9,45 @@ import (
 
 	"hackz.com/m/v2/client"
 	"hackz.com/m/v2/graph/generated"
+	"hackz.com/m/v2/graph/gormmodel"
 	"hackz.com/m/v2/graph/model"
 )
 
 // CreateDiary is the resolver for the createDiary field.
 func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary) (*model.Diary, error) {
-	panic(fmt.Errorf("not implemented: CreateDiary - createDiary"))
+	db, err := client.GetDatabase()
+	if err != nil {
+		panic(err)
+	}
+	db.Create(&gormmodel.Diary{Userid: input.UserID, Word: input.Word, Imageurl: input.Imageurl})
+
+	return &model.Diary{
+		Userid:   input.UserID,
+		Word:     input.Word,
+		Imageurl: input.Imageurl,
+	}, err
+}
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input *model.NewUser) (*model.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
 }
 
 // Diary is the resolver for the diary field.
-func (r *queryResolver) Diary(ctx context.Context) ([]*model.Diary, error) {
+func (r *queryResolver) Diary(ctx context.Context, argument *string) ([]*model.Diary, error) {
 	db, err := client.GetDatabase()
 	if err != nil {
 		panic(err)
 	}
 
+	var query = argument
 	var diary []*model.Diary
-	db.First(&diary) // find product with integer primary ke
+	if argument != nil {
+		db.First(&diary, "userid = ?", query)
+	} else {
+		db.First(&diary)
+	}
+
 	return diary, err
 }
 

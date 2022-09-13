@@ -5,10 +5,12 @@
 scalar Timestamp
 
 type Diary {
-  id: ID!
-  text: String
+  ID: ID!
+  Word: String
   imageurl:String!
-  userid: String!
+  userid: ID!
+  CreatedAt: Timestamp!
+	UpdatedAt: Timestamp!
 }
 
 type User {
@@ -17,14 +19,21 @@ type User {
 }
 
 type Query {
-  diary: [Diary!]!
+  diary(argument: ID): [Diary!]!
 }
 
 input NewDiary {
-  text: String!
+  Word: String
   userId: String!
+  imageurl:String!
+}
+
+input NewUser{
+  UserId:String!
+  name:String!
 }
 
 type Mutation {
   createDiary(input: NewDiary!): Diary!
+  createUser(input: NewUser): User!
 }
