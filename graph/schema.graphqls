@@ -5,36 +5,54 @@
 scalar Timestamp
 
 type Diary {
-  ID: ID!
+  Diaryid: ID!
   Word: String
-  imageurl:String!
-  userid: ID!
+  Imageurl:String!
+  Userid: ID!
   CreatedAt: Timestamp!
 	UpdatedAt: Timestamp!
 }
 
-type User {
-  id: ID!
-  name: String!
+type UserDiary{
+  User:User
+  Diary: [Diary!]!
 }
 
+type User{
+  Userid: ID!
+  Name: String!
+}
+
+type Me {
+  User:User!
+  Diary:[Diary!]!
+  Followee:[UserDiary!]!
+  Follower:[UserDiary!]!
+}
+
+
 type Query {
-  diary(argument: ID): [Diary!]!
-  User(argument:ID): [User!]!
+  User(argument:ID!): Me!
 }
 
 input NewDiary {
   Word: String
-  userId: String!
-  imageurl:String!
+  Userid: String!
+  Imageurl:String!
 }
 
 input NewUser{
-  UserId:String!
-  name:String!
+  Userid:String!
+  Name:String!
+}
+
+input NewFollow{
+  Followee:String!
+  Follower:String!
 }
 
 type Mutation {
   createDiary(input: NewDiary!): Diary!
   createUser(input: NewUser): User!
+  createFollow(input:NewFollow): User!
 }

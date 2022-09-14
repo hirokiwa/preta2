@@ -3,26 +3,43 @@
 package model
 
 type Diary struct {
-	ID        string  `json:"ID"`
+	Diaryid   string  `json:"Diaryid"`
 	Word      *string `json:"Word"`
-	Imageurl  string  `json:"imageurl"`
-	Userid    string  `json:"userid"`
+	Imageurl  string  `json:"Imageurl"`
+	Userid    string  `json:"Userid"`
 	CreatedAt string  `json:"CreatedAt"`
 	UpdatedAt string  `json:"UpdatedAt"`
 }
 
+type Me struct {
+	User     *User        `json:"User"`
+	Diary    []*Diary     `json:"Diary"`
+	Followee []*UserDiary `json:"Followee"`
+	Follower []*UserDiary `json:"Follower"`
+}
+
 type NewDiary struct {
 	Word     *string `json:"Word"`
-	UserID   string  `json:"userId"`
-	Imageurl string  `json:"imageurl"`
+	Userid   string  `json:"Userid"`
+	Imageurl string  `json:"Imageurl"`
+}
+
+type NewFollow struct {
+	Followee string `json:"Followee"`
+	Follower string `json:"Follower"`
 }
 
 type NewUser struct {
-	UserID string `json:"UserId"`
-	Name   string `json:"name"`
+	Userid string `json:"Userid"`
+	Name   string `json:"Name"`
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	Userid string `json:"Userid"`
+	Name   string `json:"Name"`
+}
+
+type UserDiary struct {
+	User  *User    `json:"User"`
+	Diary []*Diary `json:"Diary"`
 }

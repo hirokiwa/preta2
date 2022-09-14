@@ -4,12 +4,9 @@ import (
 	"time"
 )
 
-type autoincrement struct {
-	ID string
-}
 
 type Diary struct {
-	ID       int `gorm:"AUTO_INCREMENT"`
+	Diaryid       int `gorm:"AUTO_INCREMENT"`
 	Word     *string `sql:"Word"`
 	Imageurl string `sql:"imageurl"`
 	Userid   string `sql:"userid"`
@@ -18,6 +15,14 @@ type Diary struct {
 }
 
 type User struct {
-	ID   string `sql:"id"`
+	Userid   string `sql:"userid"`
 	Name string `sql:"name"`
+	// Diary Diary `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+}
+
+
+
+type Follow struct {
+	Followee string `gorm:"primaryKey"`
+	Follower string `gorm:"primaryKey"`
 }
