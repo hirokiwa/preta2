@@ -49,7 +49,7 @@ type ComplexityRoot struct {
 		Diaryid   func(childComplexity int) int
 		Imageurl  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
-		Userid    func(childComplexity int) int
+		User      func(childComplexity int) int
 		Word      func(childComplexity int) int
 	}
 
@@ -67,7 +67,8 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		User func(childComplexity int, argument string) int
+		AllDiary func(childComplexity int) int
+		User     func(childComplexity int, argument string) int
 	}
 
 	User struct {
@@ -88,6 +89,7 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	User(ctx context.Context, argument string) (*model.Me, error)
+	AllDiary(ctx context.Context) ([]*model.Diary, error)
 }
 
 type executableSchema struct {
@@ -133,12 +135,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.UpdatedAt(childComplexity), true
 
-	case "Diary.Userid":
-		if e.complexity.Diary.Userid == nil {
+	case "Diary.User":
+		if e.complexity.Diary.User == nil {
 			break
 		}
 
-		return e.complexity.Diary.Userid(childComplexity), true
+		return e.complexity.Diary.User(childComplexity), true
 
 	case "Diary.Word":
 		if e.complexity.Diary.Word == nil {
@@ -210,6 +212,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(*model.NewUser)), true
+
+	case "Query.AllDiary":
+		if e.complexity.Query.AllDiary == nil {
+			break
+		}
+
+		return e.complexity.Query.AllDiary(childComplexity), true
 
 	case "Query.User":
 		if e.complexity.Query.User == nil {
@@ -332,7 +341,7 @@ type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  Userid: ID!
+  User: User!
   CreatedAt: Timestamp!
 	UpdatedAt: Timestamp!
 }
@@ -341,6 +350,7 @@ type UserDiary{
   User:User
   Diary: [Diary!]!
 }
+
 
 type User{
   Userid: ID!
@@ -357,6 +367,7 @@ type Me {
 
 type Query {
   User(argument:ID!): Me!
+  AllDiary: [Diary!]!
 }
 
 input NewDiary {
@@ -629,8 +640,8 @@ func (ec *executionContext) fieldContext_Diary_Imageurl(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Diary_Userid(ctx, field)
+func (ec *executionContext) _Diary_User(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_User(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -643,7 +654,7 @@ func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Userid, nil
+		return obj.User, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -655,19 +666,25 @@ func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Diary_Userid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Diary_User(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Diary",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "Userid":
+				return ec.fieldContext_User_Userid(ctx, field)
+			case "Name":
+				return ec.fieldContext_User_Name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -856,8 +873,8 @@ func (ec *executionContext) fieldContext_Me_Diary(ctx context.Context, field gra
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1014,8 +1031,8 @@ func (ec *executionContext) fieldContext_Mutation_createDiary(ctx context.Contex
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1221,6 +1238,64 @@ func (ec *executionContext) fieldContext_Query_User(ctx context.Context, field g
 	if fc.Args, err = ec.field_Query_User_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_AllDiary(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_AllDiary(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().AllDiary(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Diary)
+	fc.Result = res
+	return ec.marshalNDiary2ᚕᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐDiaryᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_AllDiary(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Diaryid":
+				return ec.fieldContext_Diary_Diaryid(ctx, field)
+			case "Word":
+				return ec.fieldContext_Diary_Word(ctx, field)
+			case "Imageurl":
+				return ec.fieldContext_Diary_Imageurl(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
+			case "CreatedAt":
+				return ec.fieldContext_Diary_CreatedAt(ctx, field)
+			case "UpdatedAt":
+				return ec.fieldContext_Diary_UpdatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Diary", field.Name)
+		},
 	}
 	return fc, nil
 }
@@ -1534,8 +1609,8 @@ func (ec *executionContext) fieldContext_UserDiary_Diary(ctx context.Context, fi
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -3472,9 +3547,9 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Userid":
+		case "User":
 
-			out.Values[i] = ec._Diary_Userid(ctx, field, obj)
+			out.Values[i] = ec._Diary_User(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3639,6 +3714,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_User(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "AllDiary":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_AllDiary(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}

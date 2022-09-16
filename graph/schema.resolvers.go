@@ -25,11 +25,7 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 		fmt.Printf("diary create Error!!!! err:%v\n", err)
 	}
 
-	return &model.Diary{
-		Userid:   input.Userid,
-		Word:     input.Word,
-		Imageurl: input.Imageurl,
-	}, err
+	return &model.Diary{}, err
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -114,13 +110,13 @@ func (r *queryResolver) User(ctx context.Context, argument string) (*model.Me, e
 
 	}
 
-	Followee,err = resolver.FindfolloweeDiary(argument)
+	Followee, err = resolver.FindfolloweeDiary(argument)
 	if err != nil {
 
 	}
-	Follower,err = resolver.FindfollowerDiary(argument)
+	Follower, err = resolver.FindfollowerDiary(argument)
 	if err != nil {
-		
+
 	}
 
 	return &model.Me{
@@ -129,6 +125,15 @@ func (r *queryResolver) User(ctx context.Context, argument string) (*model.Me, e
 		Followee: Followee,
 		Follower: Follower,
 	}, err
+}
+
+// AllDiary is the resolver for the AllDiary field.
+func (r *queryResolver) AllDiary(ctx context.Context) ([]*model.Diary, error) {
+	Diaries,err := resolver.FindAllDiary()
+	if err != nil {
+
+	}
+	return Diaries,err
 }
 
 // Mutation returns generated.MutationResolver implementation.

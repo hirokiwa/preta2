@@ -8,7 +8,7 @@ type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  Userid: ID!
+  User: User!
   CreatedAt: Timestamp!
 	UpdatedAt: Timestamp!
 }
@@ -17,6 +17,7 @@ type UserDiary{
   User:User
   Diary: [Diary!]!
 }
+
 
 type User{
   Userid: ID!
@@ -33,6 +34,7 @@ type Me {
 
 type Query {
   User(argument:ID!): Me!
+  AllDiary: [Diary!]!
 }
 
 input NewDiary {
