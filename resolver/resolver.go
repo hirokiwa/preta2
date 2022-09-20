@@ -55,11 +55,11 @@ func FindDiary(userid string)([]*model.Diary,error){
 		panic(err)
 	}
 
-	var User *model.User = &model.User{}
-	if err := db.Where("userid = ?",userid).First(&User).Error; err != nil {
-		//エラーハンドリング
-		fmt.Printf("db select Error!!!! err:%v\n", err)
-	}
+	// var User *model.User = &model.User{}
+	// if err := db.Where("userid = ?",userid).First(&User).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+	// }
 
 	var Diaries []*gormmodel.Diary = []*gormmodel.Diary{}
 	if err := db.Where("userid = ?",userid).Find(&Diaries).Error; err != nil {
@@ -69,7 +69,7 @@ func FindDiary(userid string)([]*model.Diary,error){
 
 	var DiaryList []*model.Diary = []*model.Diary{}
 	for i:=0;i<len(Diaries);i++{
-		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(Diaries[i].Diaryid),Word:Diaries[i].Word,Imageurl: Diaries[i].Imageurl,CreatedAt: Diaries[i].CreatedAt.String(),UpdatedAt: Diaries[i].UpdatedAt.String(),User:  User}
+		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(Diaries[i].Diaryid),Word:Diaries[i].Word,Imageurl: Diaries[i].Imageurl,CreatedAt: Diaries[i].CreatedAt.String(),UpdatedAt: Diaries[i].UpdatedAt.String(),Userid: userid}
 		DiaryList = append(DiaryList, Diary)
 	}
 	return DiaryList, err
@@ -129,12 +129,12 @@ func FindAllDiary()([]*model.Diary, error){
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
 	for i := 0;i < len(GormDiaries);i++ {
-		var User *model.User = &model.User{}
-		if err := db.Where("userid = ?",GormDiaries[i].Userid).First(&User).Error; err != nil {
-			//エラーハンドリング
-			fmt.Printf("db select Error!!!! err:%v\n", err)
-		}
-		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(GormDiaries[i].Diaryid),Word:GormDiaries[i].Word,Imageurl: GormDiaries[i].Imageurl,CreatedAt: GormDiaries[i].CreatedAt.String(),UpdatedAt: GormDiaries[i].UpdatedAt.String(),User:  User}
+		// var User *model.User = &model.User{}
+		// if err := db.Where("userid = ?",GormDiaries[i].Userid).First(&User).Error; err != nil {
+		// 	//エラーハンドリング
+		// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+		// }
+		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(GormDiaries[i].Diaryid),Word:GormDiaries[i].Word,Imageurl: GormDiaries[i].Imageurl,CreatedAt: GormDiaries[i].CreatedAt.String(),UpdatedAt: GormDiaries[i].UpdatedAt.String(),Userid: GormDiaries[i].Userid}
 		Diaries = append(Diaries, Diary)
 	}
 	return Diaries, err

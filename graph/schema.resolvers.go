@@ -129,11 +129,11 @@ func (r *queryResolver) User(ctx context.Context, argument string) (*model.Me, e
 
 // AllDiary is the resolver for the AllDiary field.
 func (r *queryResolver) AllDiary(ctx context.Context) ([]*model.Diary, error) {
-	Diaries,err := resolver.FindAllDiary()
+	Diaries, err := resolver.FindAllDiary()
 	if err != nil {
 
 	}
-	return Diaries,err
+	return Diaries, err
 }
 
 // Mutation returns generated.MutationResolver implementation.

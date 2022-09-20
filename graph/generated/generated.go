@@ -49,7 +49,7 @@ type ComplexityRoot struct {
 		Diaryid   func(childComplexity int) int
 		Imageurl  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
-		User      func(childComplexity int) int
+		Userid    func(childComplexity int) int
 		Word      func(childComplexity int) int
 	}
 
@@ -135,12 +135,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.UpdatedAt(childComplexity), true
 
-	case "Diary.User":
-		if e.complexity.Diary.User == nil {
+	case "Diary.Userid":
+		if e.complexity.Diary.Userid == nil {
 			break
 		}
 
-		return e.complexity.Diary.User(childComplexity), true
+		return e.complexity.Diary.Userid(childComplexity), true
 
 	case "Diary.Word":
 		if e.complexity.Diary.Word == nil {
@@ -334,16 +334,17 @@ var sources = []*ast.Source{
 	{Name: "../schema.graphqls", Input: `# GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar Date
 
-scalar Timestamp
+
 
 type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  User: User!
-  CreatedAt: Timestamp!
-	UpdatedAt: Timestamp!
+  Userid: ID!
+  CreatedAt: Date!
+	UpdatedAt: Date!
 }
 
 type UserDiary{
@@ -640,8 +641,8 @@ func (ec *executionContext) fieldContext_Diary_Imageurl(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Diary_User(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Diary_User(ctx, field)
+func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_Userid(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -654,7 +655,7 @@ func (ec *executionContext) _Diary_User(ctx context.Context, field graphql.Colle
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.User, nil
+		return obj.Userid, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -666,25 +667,19 @@ func (ec *executionContext) _Diary_User(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNUser2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Diary_User(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Diary_Userid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Diary",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "Userid":
-				return ec.fieldContext_User_Userid(ctx, field)
-			case "Name":
-				return ec.fieldContext_User_Name(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -718,7 +713,7 @@ func (ec *executionContext) _Diary_CreatedAt(ctx context.Context, field graphql.
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNTimestamp2string(ctx, field.Selections, res)
+	return ec.marshalNDate2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Diary_CreatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -728,7 +723,7 @@ func (ec *executionContext) fieldContext_Diary_CreatedAt(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Timestamp does not have child fields")
+			return nil, errors.New("field of type Date does not have child fields")
 		},
 	}
 	return fc, nil
@@ -762,7 +757,7 @@ func (ec *executionContext) _Diary_UpdatedAt(ctx context.Context, field graphql.
 	}
 	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNTimestamp2string(ctx, field.Selections, res)
+	return ec.marshalNDate2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Diary_UpdatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -772,7 +767,7 @@ func (ec *executionContext) fieldContext_Diary_UpdatedAt(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Timestamp does not have child fields")
+			return nil, errors.New("field of type Date does not have child fields")
 		},
 	}
 	return fc, nil
@@ -873,8 +868,8 @@ func (ec *executionContext) fieldContext_Me_Diary(ctx context.Context, field gra
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "User":
-				return ec.fieldContext_Diary_User(ctx, field)
+			case "Userid":
+				return ec.fieldContext_Diary_Userid(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1031,8 +1026,8 @@ func (ec *executionContext) fieldContext_Mutation_createDiary(ctx context.Contex
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "User":
-				return ec.fieldContext_Diary_User(ctx, field)
+			case "Userid":
+				return ec.fieldContext_Diary_Userid(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1287,8 +1282,8 @@ func (ec *executionContext) fieldContext_Query_AllDiary(ctx context.Context, fie
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "User":
-				return ec.fieldContext_Diary_User(ctx, field)
+			case "Userid":
+				return ec.fieldContext_Diary_Userid(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1609,8 +1604,8 @@ func (ec *executionContext) fieldContext_UserDiary_Diary(ctx context.Context, fi
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "User":
-				return ec.fieldContext_Diary_User(ctx, field)
+			case "Userid":
+				return ec.fieldContext_Diary_Userid(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -3547,9 +3542,9 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "User":
+		case "Userid":
 
-			out.Values[i] = ec._Diary_User(ctx, field, obj)
+			out.Values[i] = ec._Diary_Userid(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4173,6 +4168,21 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNDate2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDate2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNDiary2hackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐDiary(ctx context.Context, sel ast.SelectionSet, v model.Diary) graphql.Marshaler {
 	return ec._Diary(ctx, sel, &v)
 }
@@ -4271,21 +4281,6 @@ func (ec *executionContext) unmarshalNString2string(ctx context.Context, v inter
 }
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalString(v)
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-	}
-	return res
-}
-
-func (ec *executionContext) unmarshalNTimestamp2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalString(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNTimestamp2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {

@@ -1,16 +1,17 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
+scalar Date
 
-scalar Timestamp
+
 
 type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  User: User!
-  CreatedAt: Timestamp!
-	UpdatedAt: Timestamp!
+  Userid: ID!
+  CreatedAt: Date!
+	UpdatedAt: Date!
 }
 
 type UserDiary{

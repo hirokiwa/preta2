@@ -6,7 +6,7 @@ type Diary struct {
 	Diaryid   string  `json:"Diaryid"`
 	Word      *string `json:"Word"`
 	Imageurl  string  `json:"Imageurl"`
-	User      *User   `json:"User"`
+	Userid    string  `json:"Userid"`
 	CreatedAt string  `json:"CreatedAt"`
 	UpdatedAt string  `json:"UpdatedAt"`
 }
