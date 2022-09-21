@@ -26,19 +26,25 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 		//エラーハンドリング
 		fmt.Printf("diary create Error!!!! err:%v\n", err)
 	}
+
 	if err := db.Where("imageurl=?", input.Imageurl).First(&Diary).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("diary create Error!!!! err:%v\n", err)
 	}
 
+	if err := db.Create(&gormmodel.English{Diaryid: Diary.Diaryid, Englishword: input.Englishword}).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("english create Error!!!! err:%v\n", err)
+	}
+
 	fmt.Printf("(%%#v) %#v\n", Diary)
 
 	return &model.Diary{
-		Diaryid  :strconv.Itoa(Diary.Diaryid),
-		Word    :Diary.Word,
-		Imageurl :Diary.Imageurl,
-		CreatedAt:Diary.CreatedAt.String(),
-		UpdatedAt :Diary.UpdatedAt.String(),
+		Diaryid:   strconv.Itoa(Diary.Diaryid),
+		Word:      Diary.Word,
+		Imageurl:  Diary.Imageurl,
+		CreatedAt: Diary.CreatedAt.String(),
+		UpdatedAt: Diary.UpdatedAt.String(),
 	}, err
 }
 
@@ -109,8 +115,8 @@ func (r *mutationResolver) CreateFollow(ctx context.Context, input *model.NewFol
 
 // CreateEmotion is the resolver for the createEmotion field.
 func (r *mutationResolver) CreateEmotion(ctx context.Context, input *model.NewEmotion) (*model.Emotion, error) {
-	Emotion,err := resolver.CreateNewEmotion(input)
-	return Emotion,err
+	Emotion, err := resolver.CreateNewEmotion(input)
+	return Emotion, err
 }
 
 // User is the resolver for the User field.

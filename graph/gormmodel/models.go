@@ -7,7 +7,7 @@ import (
 
 type Diary struct {
 	Diaryid       int `gorm:"AUTO_INCREMENT"`
-	Word     *string `sql:"Word"`
+	Word     string `sql:"Word"`
 	Imageurl string `sql:"imageurl"`
 	Userid   string `sql:"userid"`
 	CreatedAt time.Time `gorm:"type:datetime(6)"`
@@ -30,7 +30,7 @@ type Follow struct {
 
 type Emotion struct {
 	Diaryid   string  `gorm:"primaryKey"`
-	Happy     *string `json:"Happy"`
+	Happy     string `json:"Happy"`
 	Angry     string  `json:"Angry"`
 	Surprise  string  `json:"Surprise"`
 	Sad       string  `json:"Sad"`
@@ -42,10 +42,11 @@ type Emotion struct {
 
 type DiaryandEmotion struct {
 	Diaryid       int `gorm:"AUTO_INCREMENT"`
-	Word     *string `sql:"Word"`
+	Word     string `sql:"Word"`
+	Englishword string `sql:"Englishword"`
 	Imageurl string `sql:"imageurl"`
 	Userid   string `sql:"userid"`
-	Happy     *string `json:"Happy"`
+	Happy     string `json:"Happy"`
 	Angry     string  `json:"Angry"`
 	Surprise  string  `json:"Surprise"`
 	Sad       string  `json:"Sad"`
@@ -57,10 +58,17 @@ type DiaryandEmotion struct {
 
 type DiaryandUser struct {
 	Diaryid       int `gorm:"AUTO_INCREMENT"`
-	Word     *string `sql:"Word"`
+	Word     string `sql:"Word"`
 	Imageurl string `sql:"imageurl"`
 	Userid   string `sql:"userid"`
+	Englishword string `sql:"Englishword"`
 	Name string `sql:"name"`
 	CreatedAt time.Time `gorm:"type:datetime(6)"`
 	UpdatedAt time.Time `gorm:"type:datetime(6)"`
+}
+
+
+type English struct{
+	Diaryid int `gorm:"AUTO_INCREMENT"`
+	Englishword string `sql:"Englishword"`
 }

@@ -5,7 +5,7 @@ scalar Date
 
 type Emotion{
   Diaryid: ID!
-	Happy: String
+	Happy: String!
 	Angry: String!
 	Surprise: String!
 	Sad: String!
@@ -16,10 +16,11 @@ type Emotion{
 
 type Diary {
   Diaryid: ID!
-  Word: String
+  Word: String!
   Imageurl:String!
   User: User!
   Emotion: Emotion!
+  Englishword: String!
   CreatedAt: Date!
 	UpdatedAt: Date!
 }
@@ -49,7 +50,8 @@ type Query {
 }
 
 input NewDiary {
-  Word: String
+  Word: String!
+  Englishword: String!
   Userid: String!
   Imageurl:String!
 }
@@ -66,7 +68,7 @@ input NewFollow{
 
 input NewEmotion{
   Diaryid: String!
-	Happy: String
+	Happy: String!
 	Angry: String!
 	Surprise: String!
 	Sad: String!

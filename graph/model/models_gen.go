@@ -3,24 +3,25 @@
 package model
 
 type Diary struct {
-	Diaryid   string   `json:"Diaryid"`
-	Word      *string  `json:"Word"`
-	Imageurl  string   `json:"Imageurl"`
-	User      *User    `json:"User"`
-	Emotion   *Emotion `json:"Emotion"`
-	CreatedAt string   `json:"CreatedAt"`
-	UpdatedAt string   `json:"UpdatedAt"`
+	Diaryid     string   `json:"Diaryid"`
+	Word        string   `json:"Word"`
+	Imageurl    string   `json:"Imageurl"`
+	User        *User    `json:"User"`
+	Emotion     *Emotion `json:"Emotion"`
+	Englishword string   `json:"Englishword"`
+	CreatedAt   string   `json:"CreatedAt"`
+	UpdatedAt   string   `json:"UpdatedAt"`
 }
 
 type Emotion struct {
-	Diaryid   string  `json:"Diaryid"`
-	Happy     *string `json:"Happy"`
-	Angry     string  `json:"Angry"`
-	Surprise  string  `json:"Surprise"`
-	Sad       string  `json:"Sad"`
-	Fear      string  `json:"Fear"`
-	CreatedAt string  `json:"CreatedAt"`
-	UpdatedAt string  `json:"UpdatedAt"`
+	Diaryid   string `json:"Diaryid"`
+	Happy     string `json:"Happy"`
+	Angry     string `json:"Angry"`
+	Surprise  string `json:"Surprise"`
+	Sad       string `json:"Sad"`
+	Fear      string `json:"Fear"`
+	CreatedAt string `json:"CreatedAt"`
+	UpdatedAt string `json:"UpdatedAt"`
 }
 
 type Me struct {
@@ -31,18 +32,19 @@ type Me struct {
 }
 
 type NewDiary struct {
-	Word     *string `json:"Word"`
-	Userid   string  `json:"Userid"`
-	Imageurl string  `json:"Imageurl"`
+	Word        string `json:"Word"`
+	Englishword string `json:"Englishword"`
+	Userid      string `json:"Userid"`
+	Imageurl    string `json:"Imageurl"`
 }
 
 type NewEmotion struct {
-	Diaryid  string  `json:"Diaryid"`
-	Happy    *string `json:"Happy"`
-	Angry    string  `json:"Angry"`
-	Surprise string  `json:"Surprise"`
-	Sad      string  `json:"Sad"`
-	Fear     string  `json:"Fear"`
+	Diaryid  string `json:"Diaryid"`
+	Happy    string `json:"Happy"`
+	Angry    string `json:"Angry"`
+	Surprise string `json:"Surprise"`
+	Sad      string `json:"Sad"`
+	Fear     string `json:"Fear"`
 }
 
 type NewFollow struct {

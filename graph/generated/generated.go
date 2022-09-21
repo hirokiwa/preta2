@@ -45,13 +45,14 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Diary struct {
-		CreatedAt func(childComplexity int) int
-		Diaryid   func(childComplexity int) int
-		Emotion   func(childComplexity int) int
-		Imageurl  func(childComplexity int) int
-		UpdatedAt func(childComplexity int) int
-		User      func(childComplexity int) int
-		Word      func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		Diaryid     func(childComplexity int) int
+		Emotion     func(childComplexity int) int
+		Englishword func(childComplexity int) int
+		Imageurl    func(childComplexity int) int
+		UpdatedAt   func(childComplexity int) int
+		User        func(childComplexity int) int
+		Word        func(childComplexity int) int
 	}
 
 	Emotion struct {
@@ -141,6 +142,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Diary.Emotion(childComplexity), true
+
+	case "Diary.Englishword":
+		if e.complexity.Diary.Englishword == nil {
+			break
+		}
+
+		return e.complexity.Diary.Englishword(childComplexity), true
 
 	case "Diary.Imageurl":
 		if e.complexity.Diary.Imageurl == nil {
@@ -428,7 +436,7 @@ scalar Date
 
 type Emotion{
   Diaryid: ID!
-	Happy: String
+	Happy: String!
 	Angry: String!
 	Surprise: String!
 	Sad: String!
@@ -439,10 +447,11 @@ type Emotion{
 
 type Diary {
   Diaryid: ID!
-  Word: String
+  Word: String!
   Imageurl:String!
   User: User!
   Emotion: Emotion!
+  Englishword: String!
   CreatedAt: Date!
 	UpdatedAt: Date!
 }
@@ -472,7 +481,8 @@ type Query {
 }
 
 input NewDiary {
-  Word: String
+  Word: String!
+  Englishword: String!
   Userid: String!
   Imageurl:String!
 }
@@ -489,7 +499,7 @@ input NewFollow{
 
 input NewEmotion{
   Diaryid: String!
-	Happy: String
+	Happy: String!
 	Angry: String!
 	Surprise: String!
 	Sad: String!
@@ -702,11 +712,14 @@ func (ec *executionContext) _Diary_Word(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Diary_Word(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -878,6 +891,50 @@ func (ec *executionContext) fieldContext_Diary_Emotion(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Diary_Englishword(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_Englishword(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Englishword, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Diary_Englishword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Diary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Diary_CreatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Diary_CreatedAt(ctx, field)
 	if err != nil {
@@ -1031,11 +1088,14 @@ func (ec *executionContext) _Emotion_Happy(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Emotion_Happy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1414,6 +1474,8 @@ func (ec *executionContext) fieldContext_Me_Diary(ctx context.Context, field gra
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1574,6 +1636,8 @@ func (ec *executionContext) fieldContext_Mutation_createDiary(ctx context.Contex
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1905,6 +1969,8 @@ func (ec *executionContext) fieldContext_Query_AllDiary(ctx context.Context, fie
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -2229,6 +2295,8 @@ func (ec *executionContext) fieldContext_UserDiary_Diary(ctx context.Context, fi
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -4020,7 +4088,7 @@ func (ec *executionContext) unmarshalInputNewDiary(ctx context.Context, obj inte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"Word", "Userid", "Imageurl"}
+	fieldsInOrder := [...]string{"Word", "Englishword", "Userid", "Imageurl"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4031,7 +4099,15 @@ func (ec *executionContext) unmarshalInputNewDiary(ctx context.Context, obj inte
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Word"))
-			it.Word, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Word, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Englishword":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Englishword"))
+			it.Englishword, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4083,7 +4159,7 @@ func (ec *executionContext) unmarshalInputNewEmotion(ctx context.Context, obj in
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Happy"))
-			it.Happy, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Happy, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4226,6 +4302,9 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Diary_Word(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Imageurl":
 
 			out.Values[i] = ec._Diary_Imageurl(ctx, field, obj)
@@ -4243,6 +4322,13 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 		case "Emotion":
 
 			out.Values[i] = ec._Diary_Emotion(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Englishword":
+
+			out.Values[i] = ec._Diary_Englishword(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -4293,6 +4379,9 @@ func (ec *executionContext) _Emotion(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Emotion_Happy(ctx, field, obj)
 
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Angry":
 
 			out.Values[i] = ec._Emotion_Angry(ctx, field, obj)
