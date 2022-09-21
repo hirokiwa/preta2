@@ -47,10 +47,22 @@ type ComplexityRoot struct {
 	Diary struct {
 		CreatedAt func(childComplexity int) int
 		Diaryid   func(childComplexity int) int
+		Emotion   func(childComplexity int) int
 		Imageurl  func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
-		Userid    func(childComplexity int) int
+		User      func(childComplexity int) int
 		Word      func(childComplexity int) int
+	}
+
+	Emotion struct {
+		Angry     func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		Diaryid   func(childComplexity int) int
+		Fear      func(childComplexity int) int
+		Happy     func(childComplexity int) int
+		Sad       func(childComplexity int) int
+		Surprise  func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Me struct {
@@ -61,9 +73,10 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateDiary  func(childComplexity int, input model.NewDiary) int
-		CreateFollow func(childComplexity int, input *model.NewFollow) int
-		CreateUser   func(childComplexity int, input *model.NewUser) int
+		CreateDiary   func(childComplexity int, input model.NewDiary) int
+		CreateEmotion func(childComplexity int, input *model.NewEmotion) int
+		CreateFollow  func(childComplexity int, input *model.NewFollow) int
+		CreateUser    func(childComplexity int, input *model.NewUser) int
 	}
 
 	Query struct {
@@ -86,6 +99,7 @@ type MutationResolver interface {
 	CreateDiary(ctx context.Context, input model.NewDiary) (*model.Diary, error)
 	CreateUser(ctx context.Context, input *model.NewUser) (*model.User, error)
 	CreateFollow(ctx context.Context, input *model.NewFollow) (*model.User, error)
+	CreateEmotion(ctx context.Context, input *model.NewEmotion) (*model.Emotion, error)
 }
 type QueryResolver interface {
 	User(ctx context.Context, argument string) (*model.Me, error)
@@ -121,6 +135,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.Diaryid(childComplexity), true
 
+	case "Diary.Emotion":
+		if e.complexity.Diary.Emotion == nil {
+			break
+		}
+
+		return e.complexity.Diary.Emotion(childComplexity), true
+
 	case "Diary.Imageurl":
 		if e.complexity.Diary.Imageurl == nil {
 			break
@@ -135,12 +156,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Diary.UpdatedAt(childComplexity), true
 
-	case "Diary.Userid":
-		if e.complexity.Diary.Userid == nil {
+	case "Diary.User":
+		if e.complexity.Diary.User == nil {
 			break
 		}
 
-		return e.complexity.Diary.Userid(childComplexity), true
+		return e.complexity.Diary.User(childComplexity), true
 
 	case "Diary.Word":
 		if e.complexity.Diary.Word == nil {
@@ -148,6 +169,62 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Diary.Word(childComplexity), true
+
+	case "Emotion.Angry":
+		if e.complexity.Emotion.Angry == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Angry(childComplexity), true
+
+	case "Emotion.CreatedAt":
+		if e.complexity.Emotion.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Emotion.CreatedAt(childComplexity), true
+
+	case "Emotion.Diaryid":
+		if e.complexity.Emotion.Diaryid == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Diaryid(childComplexity), true
+
+	case "Emotion.Fear":
+		if e.complexity.Emotion.Fear == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Fear(childComplexity), true
+
+	case "Emotion.Happy":
+		if e.complexity.Emotion.Happy == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Happy(childComplexity), true
+
+	case "Emotion.Sad":
+		if e.complexity.Emotion.Sad == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Sad(childComplexity), true
+
+	case "Emotion.Surprise":
+		if e.complexity.Emotion.Surprise == nil {
+			break
+		}
+
+		return e.complexity.Emotion.Surprise(childComplexity), true
+
+	case "Emotion.UpdatedAt":
+		if e.complexity.Emotion.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Emotion.UpdatedAt(childComplexity), true
 
 	case "Me.Diary":
 		if e.complexity.Me.Diary == nil {
@@ -188,6 +265,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateDiary(childComplexity, args["input"].(model.NewDiary)), true
+
+	case "Mutation.createEmotion":
+		if e.complexity.Mutation.CreateEmotion == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createEmotion_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateEmotion(childComplexity, args["input"].(*model.NewEmotion)), true
 
 	case "Mutation.createFollow":
 		if e.complexity.Mutation.CreateFollow == nil {
@@ -269,6 +358,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputNewDiary,
+		ec.unmarshalInputNewEmotion,
 		ec.unmarshalInputNewFollow,
 		ec.unmarshalInputNewUser,
 	)
@@ -336,13 +426,23 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 scalar Date
 
-
+type Emotion{
+  Diaryid: ID!
+	Happy: String
+	Angry: String!
+	Surprise: String!
+	Sad: String!
+	Fear: String!
+	CreatedAt: Date!
+  UpdatedAt: Date!
+}
 
 type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  Userid: ID!
+  User: User!
+  Emotion: Emotion!
   CreatedAt: Date!
 	UpdatedAt: Date!
 }
@@ -387,10 +487,20 @@ input NewFollow{
   Follower:String!
 }
 
+input NewEmotion{
+  Diaryid: String!
+	Happy: String
+	Angry: String!
+	Surprise: String!
+	Sad: String!
+	Fear: String!
+}
+
 type Mutation {
   createDiary(input: NewDiary!): Diary!
   createUser(input: NewUser): User!
   createFollow(input:NewFollow): User!
+  createEmotion(input: NewEmotion): Emotion!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -406,6 +516,21 @@ func (ec *executionContext) field_Mutation_createDiary_args(ctx context.Context,
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNNewDiary2hackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐNewDiary(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createEmotion_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *model.NewEmotion
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalONewEmotion2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐNewEmotion(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -641,8 +766,8 @@ func (ec *executionContext) fieldContext_Diary_Imageurl(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Diary_Userid(ctx, field)
+func (ec *executionContext) _Diary_User(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_User(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -655,7 +780,7 @@ func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Userid, nil
+		return obj.User, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -667,19 +792,87 @@ func (ec *executionContext) _Diary_Userid(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Diary_Userid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Diary_User(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Diary",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			switch field.Name {
+			case "Userid":
+				return ec.fieldContext_User_Userid(ctx, field)
+			case "Name":
+				return ec.fieldContext_User_Name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Diary_Emotion(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_Emotion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Emotion, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Emotion)
+	fc.Result = res
+	return ec.marshalNEmotion2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐEmotion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Diary_Emotion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Diary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Diaryid":
+				return ec.fieldContext_Emotion_Diaryid(ctx, field)
+			case "Happy":
+				return ec.fieldContext_Emotion_Happy(ctx, field)
+			case "Angry":
+				return ec.fieldContext_Emotion_Angry(ctx, field)
+			case "Surprise":
+				return ec.fieldContext_Emotion_Surprise(ctx, field)
+			case "Sad":
+				return ec.fieldContext_Emotion_Sad(ctx, field)
+			case "Fear":
+				return ec.fieldContext_Emotion_Fear(ctx, field)
+			case "CreatedAt":
+				return ec.fieldContext_Emotion_CreatedAt(ctx, field)
+			case "UpdatedAt":
+				return ec.fieldContext_Emotion_UpdatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Emotion", field.Name)
 		},
 	}
 	return fc, nil
@@ -763,6 +956,355 @@ func (ec *executionContext) _Diary_UpdatedAt(ctx context.Context, field graphql.
 func (ec *executionContext) fieldContext_Diary_UpdatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Diary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Diaryid(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Diaryid(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Diaryid, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Diaryid(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Happy(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Happy(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Happy, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Happy(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Angry(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Angry(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Angry, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Angry(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Surprise(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Surprise(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Surprise, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Surprise(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Sad(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Sad(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Sad, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Sad(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_Fear(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_Fear(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Fear, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_Fear(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_CreatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_CreatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDate2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_CreatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Emotion_UpdatedAt(ctx context.Context, field graphql.CollectedField, obj *model.Emotion) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Emotion_UpdatedAt(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.UpdatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNDate2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Emotion_UpdatedAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Emotion",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -868,8 +1410,10 @@ func (ec *executionContext) fieldContext_Me_Diary(ctx context.Context, field gra
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
+			case "Emotion":
+				return ec.fieldContext_Diary_Emotion(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1026,8 +1570,10 @@ func (ec *executionContext) fieldContext_Mutation_createDiary(ctx context.Contex
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
+			case "Emotion":
+				return ec.fieldContext_Diary_Emotion(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1172,6 +1718,79 @@ func (ec *executionContext) fieldContext_Mutation_createFollow(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createEmotion(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createEmotion(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateEmotion(rctx, fc.Args["input"].(*model.NewEmotion))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.Emotion)
+	fc.Result = res
+	return ec.marshalNEmotion2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐEmotion(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createEmotion(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "Diaryid":
+				return ec.fieldContext_Emotion_Diaryid(ctx, field)
+			case "Happy":
+				return ec.fieldContext_Emotion_Happy(ctx, field)
+			case "Angry":
+				return ec.fieldContext_Emotion_Angry(ctx, field)
+			case "Surprise":
+				return ec.fieldContext_Emotion_Surprise(ctx, field)
+			case "Sad":
+				return ec.fieldContext_Emotion_Sad(ctx, field)
+			case "Fear":
+				return ec.fieldContext_Emotion_Fear(ctx, field)
+			case "CreatedAt":
+				return ec.fieldContext_Emotion_CreatedAt(ctx, field)
+			case "UpdatedAt":
+				return ec.fieldContext_Emotion_UpdatedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Emotion", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createEmotion_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_User(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_User(ctx, field)
 	if err != nil {
@@ -1282,8 +1901,10 @@ func (ec *executionContext) fieldContext_Query_AllDiary(ctx context.Context, fie
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
+			case "Emotion":
+				return ec.fieldContext_Diary_Emotion(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1604,8 +2225,10 @@ func (ec *executionContext) fieldContext_UserDiary_Diary(ctx context.Context, fi
 				return ec.fieldContext_Diary_Word(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
-			case "Userid":
-				return ec.fieldContext_Diary_Userid(ctx, field)
+			case "User":
+				return ec.fieldContext_Diary_User(ctx, field)
+			case "Emotion":
+				return ec.fieldContext_Diary_Emotion(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -3434,6 +4057,74 @@ func (ec *executionContext) unmarshalInputNewDiary(ctx context.Context, obj inte
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewEmotion(ctx context.Context, obj interface{}) (model.NewEmotion, error) {
+	var it model.NewEmotion
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"Diaryid", "Happy", "Angry", "Surprise", "Sad", "Fear"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "Diaryid":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Diaryid"))
+			it.Diaryid, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Happy":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Happy"))
+			it.Happy, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Angry":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Angry"))
+			it.Angry, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Surprise":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Surprise"))
+			it.Surprise, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Sad":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Sad"))
+			it.Sad, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "Fear":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("Fear"))
+			it.Fear, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewFollow(ctx context.Context, obj interface{}) (model.NewFollow, error) {
 	var it model.NewFollow
 	asMap := map[string]interface{}{}
@@ -3542,9 +4233,16 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "Userid":
+		case "User":
 
-			out.Values[i] = ec._Diary_Userid(ctx, field, obj)
+			out.Values[i] = ec._Diary_User(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Emotion":
+
+			out.Values[i] = ec._Diary_Emotion(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3559,6 +4257,80 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 		case "UpdatedAt":
 
 			out.Values[i] = ec._Diary_UpdatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var emotionImplementors = []string{"Emotion"}
+
+func (ec *executionContext) _Emotion(ctx context.Context, sel ast.SelectionSet, obj *model.Emotion) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, emotionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Emotion")
+		case "Diaryid":
+
+			out.Values[i] = ec._Emotion_Diaryid(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Happy":
+
+			out.Values[i] = ec._Emotion_Happy(ctx, field, obj)
+
+		case "Angry":
+
+			out.Values[i] = ec._Emotion_Angry(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Surprise":
+
+			out.Values[i] = ec._Emotion_Surprise(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Sad":
+
+			out.Values[i] = ec._Emotion_Sad(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "Fear":
+
+			out.Values[i] = ec._Emotion_Fear(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "CreatedAt":
+
+			out.Values[i] = ec._Emotion_CreatedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "UpdatedAt":
+
+			out.Values[i] = ec._Emotion_UpdatedAt(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3664,6 +4436,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createFollow(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createEmotion":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createEmotion(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -4241,6 +5022,20 @@ func (ec *executionContext) marshalNDiary2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmode
 	return ec._Diary(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNEmotion2hackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐEmotion(ctx context.Context, sel ast.SelectionSet, v model.Emotion) graphql.Marshaler {
+	return ec._Emotion(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNEmotion2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐEmotion(ctx context.Context, sel ast.SelectionSet, v *model.Emotion) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Emotion(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalID(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -4635,6 +5430,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalONewEmotion2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐNewEmotion(ctx context.Context, v interface{}) (*model.NewEmotion, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputNewEmotion(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalONewFollow2ᚖhackzᚗcomᚋmᚋv2ᚋgraphᚋmodelᚐNewFollow(ctx context.Context, v interface{}) (*model.NewFollow, error) {

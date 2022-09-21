@@ -26,3 +26,41 @@ type Follow struct {
 	Followee string `gorm:"primaryKey"`
 	Follower string `gorm:"primaryKey"`
 }
+
+
+type Emotion struct {
+	Diaryid   string  `gorm:"primaryKey"`
+	Happy     *string `json:"Happy"`
+	Angry     string  `json:"Angry"`
+	Surprise  string  `json:"Surprise"`
+	Sad       string  `json:"Sad"`
+	Fear      string  `json:"Fear"`
+	CreatedAt time.Time  `gorm:"type:datetime(6)"`
+	UpdatedAt time.Time  `gorm:"type:datetime(6)"`
+}
+
+
+type DiaryandEmotion struct {
+	Diaryid       int `gorm:"AUTO_INCREMENT"`
+	Word     *string `sql:"Word"`
+	Imageurl string `sql:"imageurl"`
+	Userid   string `sql:"userid"`
+	Happy     *string `json:"Happy"`
+	Angry     string  `json:"Angry"`
+	Surprise  string  `json:"Surprise"`
+	Sad       string  `json:"Sad"`
+	Fear      string  `json:"Fear"`
+	Name string `sql:"name"`
+	CreatedAt time.Time `gorm:"type:datetime(6)"`
+	UpdatedAt time.Time `gorm:"type:datetime(6)"`
+}
+
+type DiaryandUser struct {
+	Diaryid       int `gorm:"AUTO_INCREMENT"`
+	Word     *string `sql:"Word"`
+	Imageurl string `sql:"imageurl"`
+	Userid   string `sql:"userid"`
+	Name string `sql:"name"`
+	CreatedAt time.Time `gorm:"type:datetime(6)"`
+	UpdatedAt time.Time `gorm:"type:datetime(6)"`
+}

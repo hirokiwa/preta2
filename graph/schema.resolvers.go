@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"hackz.com/m/v2/client"
 	"hackz.com/m/v2/graph/generated"
@@ -17,6 +18,7 @@ import (
 // CreateDiary is the resolver for the createDiary field.
 func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary) (*model.Diary, error) {
 	db, err := client.GetDatabase()
+	var Diary = &gormmodel.Diary{}
 	if err != nil {
 		panic(err)
 	}
@@ -24,8 +26,20 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 		//エラーハンドリング
 		fmt.Printf("diary create Error!!!! err:%v\n", err)
 	}
+	if err := db.Where("imageurl=?", input.Imageurl).First(&Diary).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("diary create Error!!!! err:%v\n", err)
+	}
 
-	return &model.Diary{}, err
+	fmt.Printf("(%%#v) %#v\n", Diary)
+
+	return &model.Diary{
+		Diaryid  :strconv.Itoa(Diary.Diaryid),
+		Word    :Diary.Word,
+		Imageurl :Diary.Imageurl,
+		CreatedAt:Diary.CreatedAt.String(),
+		UpdatedAt :Diary.UpdatedAt.String(),
+	}, err
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -91,6 +105,12 @@ func (r *mutationResolver) CreateFollow(ctx context.Context, input *model.NewFol
 		Userid: input.Follower,
 		Name:   folllower.Name,
 	}, err
+}
+
+// CreateEmotion is the resolver for the createEmotion field.
+func (r *mutationResolver) CreateEmotion(ctx context.Context, input *model.NewEmotion) (*model.Emotion, error) {
+	Emotion,err := resolver.CreateNewEmotion(input)
+	return Emotion,err
 }
 
 // User is the resolver for the User field.

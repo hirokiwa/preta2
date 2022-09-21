@@ -49,31 +49,42 @@ func FindUser(userid string)(*model.User, error){
 	return user, err
 }
 
-func FindDiary(userid string)([]*model.Diary,error){
-	db, err := client.GetDatabase();
-	if err != nil {
-		panic(err)
-	}
+// func FindDiary(userid string)([]*model.Diary,error){
+// 	db, err := client.GetDatabase();
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	// var User *model.User = &model.User{}
-	// if err := db.Where("userid = ?",userid).First(&User).Error; err != nil {
-	// 	//エラーハンドリング
-	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
-	// }
+// 	// var User *model.User = &model.User{}
+// 	// if err := db.Where("userid = ?",userid).First(&User).Error; err != nil {
+// 	// 	//エラーハンドリング
+// 	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+// 	// }
 
-	var Diaries []*gormmodel.Diary = []*gormmodel.Diary{}
-	if err := db.Where("userid = ?",userid).Find(&Diaries).Error; err != nil {
-		//エラーハンドリング
-		fmt.Printf("db select Error!!!! err:%v\n", err)
-	}
+// 	var Diaries []*gormmodel.Diary = []*gormmodel.Diary{}
+// 	var DiaryandUser []*gormmodel.DiaryandUser = []*gormmodel.DiaryandUser{}
+// 	if err := db.Model(&Diaries).Select("*").Joins("inner join `users` on diaries.userid = users.userid").Order("diaries.created_at").Scan(&DiaryandUser).Error; err != nil {
+// 		//エラーハンドリング
+// 		fmt.Printf("db select Error!!!! err:%v\n", err)
+// 	}
+	
+// 	if err := db.Where("userid = ?",userid).Find(&Diaries).Error; err != nil {
+// 		//エラーハンドリング
+// 		fmt.Printf("db select Error!!!! err:%v\n", err)
+// 	}
 
-	var DiaryList []*model.Diary = []*model.Diary{}
-	for i:=0;i<len(Diaries);i++{
-		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(Diaries[i].Diaryid),Word:Diaries[i].Word,Imageurl: Diaries[i].Imageurl,CreatedAt: Diaries[i].CreatedAt.String(),UpdatedAt: Diaries[i].UpdatedAt.String(),Userid: userid}
-		DiaryList = append(DiaryList, Diary)
-	}
-	return DiaryList, err
-}
+// 	var DiaryList []*model.Diary = []*model.Diary{}
+// 	for i:=0;i<len(Diaries);i++{
+// 		// var Emotion *model.Emotion = &model.Emotion{}
+// 		Emotion,err := FindEmotion(Diaries[i].Diaryid)
+// 		if err != nil{
+
+// 		}
+// 		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(Diaries[i].Diaryid),Word:Diaries[i].Word,Imageurl: Diaries[i].Imageurl,CreatedAt: Diaries[i].CreatedAt.String(),UpdatedAt: Diaries[i].UpdatedAt.String(),Userid: userid,Emotion: Emotion}
+// 		DiaryList = append(DiaryList, Diary)
+// 	}
+// 	return DiaryList, err
+// }
 
 func FindfolloweeDiary(userid string)([]*model.UserDiary,error){
 	var UserDiaryList []*model.UserDiary  = []*model.UserDiary{}
@@ -123,21 +134,111 @@ func FindAllDiary()([]*model.Diary, error){
 
 	var Diaries []*model.Diary = []*model.Diary{}
 	var GormDiaries []*gormmodel.Diary = []*gormmodel.Diary{}
+	var GormDiaryandEmotion []*gormmodel.DiaryandEmotion = []*gormmodel.DiaryandEmotion{}
 
-	if err := db.Order("created_at").Find(&GormDiaries).Error; err != nil {
+	if err := db.Model(&GormDiaries).Select("*").Joins("inner join `emotions` on diaries.diaryid = emotions.diaryid").Joins("inner join `users` on diaries.userid = users.userid").Order("diaries.created_at").Scan(&GormDiaryandEmotion).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
-	for i := 0;i < len(GormDiaries);i++ {
+
+	// if err := db.Order("created_at").Find(&GormDiaries).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+	// }
+	
+	for i := 0;i < len(GormDiaryandEmotion);i++ {
 		// var User *model.User = &model.User{}
 		// if err := db.Where("userid = ?",GormDiaries[i].Userid).First(&User).Error; err != nil {
 		// 	//エラーハンドリング
 		// 	fmt.Printf("db select Error!!!! err:%v\n", err)
 		// }
-		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(GormDiaries[i].Diaryid),Word:GormDiaries[i].Word,Imageurl: GormDiaries[i].Imageurl,CreatedAt: GormDiaries[i].CreatedAt.String(),UpdatedAt: GormDiaries[i].UpdatedAt.String(),Userid: GormDiaries[i].Userid}
+		fmt.Printf("(%%#v) %#v\n", GormDiaryandEmotion[i])
+		var Emotion *model.Emotion = &model.Emotion{Diaryid:strconv.Itoa(GormDiaryandEmotion[i].Diaryid),Happy: GormDiaryandEmotion[i].Happy,Angry: GormDiaryandEmotion[i].Angry,Surprise:GormDiaryandEmotion[i].Surprise,Sad: GormDiaryandEmotion[i].Sad,Fear: GormDiaryandEmotion[i].Fear}
+		var User *model.User = &model.User{Userid: GormDiaryandEmotion[i].Userid,Name: GormDiaryandEmotion[i].Name}
+		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(GormDiaryandEmotion[i].Diaryid),Word:GormDiaryandEmotion[i].Word,Imageurl: GormDiaryandEmotion[i].Imageurl,CreatedAt: GormDiaryandEmotion[i].CreatedAt.String(),UpdatedAt: GormDiaryandEmotion[i].UpdatedAt.String(),User:User,Emotion: Emotion}
 		Diaries = append(Diaries, Diary)
 	}
 	return Diaries, err
 }
+
+
+func FindEmotion(diaryid int)(*model.Emotion,error){
+	db, err := client.GetDatabase();
+	if err != nil {
+		panic(err)
+	}
+	print("diaryid",diaryid)
+	var Emotion *gormmodel.Emotion = &gormmodel.Emotion{}
+	if err := db.Where("diaryid=?",strconv.Itoa(diaryid)).First(&Emotion).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("db select Error!!!! err:%v\n", err)
+	}
+	return &model.Emotion{
+		Diaryid:Emotion.Diaryid,
+		Happy: Emotion.Happy,
+		Angry: Emotion.Angry,
+		Surprise:Emotion.Surprise,
+		Sad: Emotion.Sad,
+		Fear: Emotion.Fear ,
+	}, err
+
+}
+
+func CreateNewEmotion(input *model.NewEmotion)(*model.Emotion,error){
+	db, err := client.GetDatabase();
+	if err != nil {
+		panic(err)
+	}
+	if err := db.Create(&gormmodel.Emotion{Diaryid:input.Diaryid,Happy: input.Happy,Angry: input.Angry,Surprise:input.Surprise,Sad: input.Sad,Fear: input.Fear}).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("followe err:%v\n", err)
+	}
+	return &model.Emotion{
+		Diaryid:input.Diaryid,
+		Happy: input.Happy,
+		Angry: input.Angry,
+		Surprise:input.Surprise,
+		Sad: input.Sad,
+		Fear: input.Fear ,
+	}, err
+}
+
+
+
+func FindDiary(userid string)([]*model.Diary, error){
+	db, err := client.GetDatabase();
+	if err != nil {
+		panic(err)
+	}
+
+	var Diaries []*model.Diary = []*model.Diary{}
+	var GormDiaries []*gormmodel.Diary = []*gormmodel.Diary{}
+	var GormDiaryandEmotion []*gormmodel.DiaryandEmotion = []*gormmodel.DiaryandEmotion{}
+
+	if err := db.Model(&GormDiaries).Select("*").Where("diaries.userid=?",userid).Joins("inner join `emotions` on diaries.diaryid = emotions.diaryid").Joins("inner join `users` on diaries.userid = users.userid").Order("diaries.created_at").Scan(&GormDiaryandEmotion).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("db select Error!!!! err:%v\n", err)
+	}
+
+	// if err := db.Order("created_at").Find(&GormDiaries).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+	// }
+	
+	for i := 0;i < len(GormDiaryandEmotion);i++ {
+		// var User *model.User = &model.User{}
+		// if err := db.Where("userid = ?",GormDiaries[i].Userid).First(&User).Error; err != nil {
+		// 	//エラーハンドリング
+		// 	fmt.Printf("db select Error!!!! err:%v\n", err)
+		// }
+		fmt.Printf("(%%#v) %#v\n", GormDiaryandEmotion[i])
+		var Emotion *model.Emotion = &model.Emotion{Diaryid:strconv.Itoa(GormDiaryandEmotion[i].Diaryid),Happy: GormDiaryandEmotion[i].Happy,Angry: GormDiaryandEmotion[i].Angry,Surprise:GormDiaryandEmotion[i].Surprise,Sad: GormDiaryandEmotion[i].Sad,Fear: GormDiaryandEmotion[i].Fear}
+		var User *model.User = &model.User{Userid: GormDiaryandEmotion[i].Userid,Name: GormDiaryandEmotion[i].Name}
+		var Diary *model.Diary = &model.Diary{Diaryid: strconv.Itoa(GormDiaryandEmotion[i].Diaryid),Word:GormDiaryandEmotion[i].Word,Imageurl: GormDiaryandEmotion[i].Imageurl,CreatedAt: GormDiaryandEmotion[i].CreatedAt.String(),UpdatedAt: GormDiaryandEmotion[i].UpdatedAt.String(),User:User,Emotion: Emotion}
+		Diaries = append(Diaries, Diary)
+	}
+	return Diaries, err
+}
+
 
 

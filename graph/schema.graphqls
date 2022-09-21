@@ -3,13 +3,23 @@
 # https://gqlgen.com/getting-started/
 scalar Date
 
-
+type Emotion{
+  Diaryid: ID!
+	Happy: String
+	Angry: String!
+	Surprise: String!
+	Sad: String!
+	Fear: String!
+	CreatedAt: Date!
+  UpdatedAt: Date!
+}
 
 type Diary {
   Diaryid: ID!
   Word: String
   Imageurl:String!
-  Userid: ID!
+  User: User!
+  Emotion: Emotion!
   CreatedAt: Date!
 	UpdatedAt: Date!
 }
@@ -54,8 +64,18 @@ input NewFollow{
   Follower:String!
 }
 
+input NewEmotion{
+  Diaryid: String!
+	Happy: String
+	Angry: String!
+	Surprise: String!
+	Sad: String!
+	Fear: String!
+}
+
 type Mutation {
   createDiary(input: NewDiary!): Diary!
   createUser(input: NewUser): User!
   createFollow(input:NewFollow): User!
+  createEmotion(input: NewEmotion): Emotion!
 }

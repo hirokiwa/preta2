@@ -3,10 +3,22 @@
 package model
 
 type Diary struct {
+	Diaryid   string   `json:"Diaryid"`
+	Word      *string  `json:"Word"`
+	Imageurl  string   `json:"Imageurl"`
+	User      *User    `json:"User"`
+	Emotion   *Emotion `json:"Emotion"`
+	CreatedAt string   `json:"CreatedAt"`
+	UpdatedAt string   `json:"UpdatedAt"`
+}
+
+type Emotion struct {
 	Diaryid   string  `json:"Diaryid"`
-	Word      *string `json:"Word"`
-	Imageurl  string  `json:"Imageurl"`
-	Userid    string  `json:"Userid"`
+	Happy     *string `json:"Happy"`
+	Angry     string  `json:"Angry"`
+	Surprise  string  `json:"Surprise"`
+	Sad       string  `json:"Sad"`
+	Fear      string  `json:"Fear"`
 	CreatedAt string  `json:"CreatedAt"`
 	UpdatedAt string  `json:"UpdatedAt"`
 }
@@ -22,6 +34,15 @@ type NewDiary struct {
 	Word     *string `json:"Word"`
 	Userid   string  `json:"Userid"`
 	Imageurl string  `json:"Imageurl"`
+}
+
+type NewEmotion struct {
+	Diaryid  string  `json:"Diaryid"`
+	Happy    *string `json:"Happy"`
+	Angry    string  `json:"Angry"`
+	Surprise string  `json:"Surprise"`
+	Sad      string  `json:"Sad"`
+	Fear     string  `json:"Fear"`
 }
 
 type NewFollow struct {
