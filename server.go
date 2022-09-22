@@ -19,7 +19,7 @@ func main() {
 	// Add CORS middleware around every request
 	// See https://github.com/rs/cors for full option listing
 	router.Use(cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"http://localhost:3000","https://alexture-diary-7ak4y4niw-mochimochi.vercel.app"},
 		AllowCredentials: true,
 		Debug:            true,
 	}).Handler)
