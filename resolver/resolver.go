@@ -3,16 +3,15 @@ package resolver
 import (
 	"fmt"
 	"strconv"
-	"hackz.com/m/v2/client"
-	"hackz.com/m/v2/graph/gormmodel"
+	"hackz.com/m/v2/domain/model"
 	"hackz.com/m/v2/graph/model"
+	"hackz.com/m/v2/infrastructure"
+
 )
 
 func Findfollowee(userid string)([]*model.User, error){
-	db, err := client.GetDatabase() 
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	var follow []*gormmodel.Follow = []*gormmodel.Follow{}
 	var user []*model.User = []*model.User{}
 	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.follower = users.userid").Where("follows.followee = ?", userid).Scan(&user).Error; err != nil {
@@ -23,10 +22,8 @@ func Findfollowee(userid string)([]*model.User, error){
 }
 
 func Findfollower(userid string)([]*model.User, error){
-	db, err := client.GetDatabase() 
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	var follow []*gormmodel.Follow = []*gormmodel.Follow{}
 	var user []*model.User = []*model.User{}
 	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.followee = users.userid").Where("follows.follower = ?", userid).Scan(&user).Error; err != nil {
@@ -37,10 +34,8 @@ func Findfollower(userid string)([]*model.User, error){
 }
 
 func FindUser(userid string)(*model.User, error){
-	db, err := client.GetDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	var user *model.User = &model.User{}	
 	if err := db.Where("userid = ?", userid).First(&user).Error; err != nil {
 		//エラーハンドリング
@@ -153,10 +148,8 @@ func FindAllDiary()([]*model.Diary, error){
 
 
 func FindEmotion(diaryid int)(*model.Emotion,error){
-	db, err := client.GetDatabase();
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	print("diaryid",diaryid)
 	var Emotion *gormmodel.Emotion = &gormmodel.Emotion{}
 	if err := db.Where("diaryid=?",strconv.Itoa(diaryid)).First(&Emotion).Error; err != nil {
@@ -196,10 +189,8 @@ func CreateNewEmotion(input *model.NewEmotion)(*model.Emotion,error){
 
 
 func FindDiary(userid string)([]*model.Diary, error){
-	db, err := client.GetDatabase();
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 
 	var Diaries []*model.Diary = []*model.Diary{}
 	var GormDiaries []*gormmodel.Diary = []*gormmodel.Diary{}

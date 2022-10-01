@@ -8,36 +8,35 @@ import (
 	"fmt"
 	"strconv"
 
-	"hackz.com/m/v2/client"
+	"hackz.com/m/v2/domain/model"
+	"hackz.com/m/v2/domain/repository"
 	"hackz.com/m/v2/graph/generated"
-	"hackz.com/m/v2/graph/gormmodel"
 	"hackz.com/m/v2/graph/model"
+	"hackz.com/m/v2/infrastructure"
+	"hackz.com/m/v2/infrastructure/queryImpl/diary"
 	"hackz.com/m/v2/resolver"
 )
 
 // CreateDiary is the resolver for the createDiary field.
 func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary) (*model.Diary, error) {
-	db, err := client.GetDatabase()
-	var Diary = &gormmodel.Diary{}
-	if err != nil {
-		panic(err)
-	}
-	if err := db.Create(&gormmodel.Diary{Userid: input.Userid, Word: input.Word, Imageurl: input.Imageurl}).Error; err != nil {
-		//エラーハンドリング
-		fmt.Printf("diary create Error!!!! err:%v\n", err)
-	}
+	// var err error
+	// var Diary = &model.Diary{}
+	// if err := db.Create(&gormmodel.Diary{Userid: input.Userid, Word: input.Word, Imageurl: input.Imageurl}).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("diary create Error!!!! err:%v\n", err)
+	// }
 
-	if err := db.Where("imageurl=?", input.Imageurl).First(&Diary).Error; err != nil {
-		//エラーハンドリング
-		fmt.Printf("diary create Error!!!! err:%v\n", err)
-	}
+	// if err := db.Where("imageurl=?", input.Imageurl).First(&Diary).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("diary create Error!!!! err:%v\n", err)
+	// }
 
-	if err := db.Create(&gormmodel.English{Diaryid: Diary.Diaryid, Englishword: input.Englishword}).Error; err != nil {
-		//エラーハンドリング
-		fmt.Printf("english create Error!!!! err:%v\n", err)
-	}
+	// if err := db.Create(&gormmodel.English{Diaryid: Diary.Diaryid, Englishword: input.Englishword}).Error; err != nil {
+	// 	//エラーハンドリング
+	// 	fmt.Printf("english create Error!!!! err:%v\n", err)
+	// }
 
-	fmt.Printf("(%%#v) %#v\n", Diary)
+	// fmt.Printf("(%%#v) %#v\n", Diary)
 
 	return &model.Diary{
 		Diaryid:   strconv.Itoa(Diary.Diaryid),
@@ -46,14 +45,13 @@ func (r *mutationResolver) CreateDiary(ctx context.Context, input model.NewDiary
 		CreatedAt: Diary.CreatedAt.String(),
 		UpdatedAt: Diary.UpdatedAt.String(),
 	}, err
+
 }
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input *model.NewUser) (*model.User, error) {
-	db, err := client.GetDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	if err := db.Create(&gormmodel.User{Userid: input.Userid, Name: input.Name}).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("user create Error!!!! err:%v\n", err)
@@ -71,10 +69,8 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input *model.NewUser)
 
 // CreateFollow is the resolver for the createFollow field.
 func (r *mutationResolver) CreateFollow(ctx context.Context, input *model.NewFollow) (*model.User, error) {
-	db, err := client.GetDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 
 	var folllower = &gormmodel.User{}
 
@@ -155,9 +151,10 @@ func (r *queryResolver) User(ctx context.Context, argument string) (*model.Me, e
 
 // AllDiary is the resolver for the AllDiary field.
 func (r *queryResolver) AllDiary(ctx context.Context) ([]*model.Diary, error) {
-	Diaries, err := resolver.FindAllDiary()
+	var err error
+	diaryCtrl := diary.DiaryQueryImpl{}
+	Diaries := diaryCtrl.FindAll()
 	if err != nil {
-
 	}
 	return Diaries, err
 }
@@ -178,10 +175,8 @@ type queryResolver struct{ *Resolver }
 //     it when you're done.
 //   - You have helper methods in this file. Move them out to keep these resolver files clean.
 func (r *queryResolver) Diary(ctx context.Context, argument *string) ([]*model.Diary, error) {
-	db, err := client.GetDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 
 	var query = argument
 	var diary []*model.Diary
@@ -203,10 +198,8 @@ func (r *queryResolver) Followee(ctx context.Context, argument string) ([]*model
 	panic("")
 }
 func (r *queryResolver) Follower(ctx context.Context, argument string) ([]*model.User, error) {
-	db, err := client.GetDatabase()
-	if err != nil {
-		panic(err)
-	}
+	db := infrastructure.GetDB()
+	var err error
 	var follow []*gormmodel.Follow
 	var user []*model.User
 	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.followee = users.userid").Where("follows.follower = ?", argument).Scan(&user).Error; err != nil {
