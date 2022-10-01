@@ -6,6 +6,6 @@ import (
 
 
 type DiaryRepository interface{
-	FindDiary(serid string)([]*model.Diary,error)
+	FindDiary(userid string)([]*model.Diary,error)
 	CreateDiary(input model.NewDiary )(*model.Diary,error)
 }
