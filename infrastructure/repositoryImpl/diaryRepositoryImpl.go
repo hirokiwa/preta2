@@ -29,18 +29,8 @@ func (repositoryImpl *DiaryRepositoryImpl) FindDiary(userid string)([]*model.Dia
 		//エラーハンドリング
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
-
-	// if err := db.Order("created_at").Find(&GormDiaries).Error; err != nil {
-	// 	//エラーハンドリング
-	// 	fmt.Printf("db select Error!!!! err:%v\n", err)
-	// }
 	
 	for i := 0;i < len(GormDiaryandEmotion);i++ {
-		// var User *model.User = &model.User{}
-		// if err := db.Where("userid = ?",GormDiaries[i].Userid).First(&User).Error; err != nil {
-		// 	//エラーハンドリング
-		// 	fmt.Printf("db select Error!!!! err:%v\n", err)
-		// }
 		fmt.Printf("(%%#v) %#v\n", GormDiaryandEmotion[i])
 		var Emotion *model.Emotion = &model.Emotion{Diaryid:strconv.Itoa(GormDiaryandEmotion[i].Diaryid),Happy: GormDiaryandEmotion[i].Happy,Angry: GormDiaryandEmotion[i].Angry,Surprise:GormDiaryandEmotion[i].Surprise,Sad: GormDiaryandEmotion[i].Sad,Fear: GormDiaryandEmotion[i].Fear}
 		var User *model.User = &model.User{Userid: GormDiaryandEmotion[i].Userid,Name: GormDiaryandEmotion[i].Name}
@@ -76,5 +66,22 @@ func (repositoryImpl *DiaryRepositoryImpl) CreateDiary(input model.NewDiary)(*mo
 		Imageurl:  Diary.Imageurl,
 		CreatedAt: Diary.CreatedAt.String(),
 		UpdatedAt: Diary.UpdatedAt.String(),
+	}, err
+}
+
+func (repositoryImpl *DiaryRepositoryImpl) CreateEmotion(input model.NewEmotion)(*model.Emotion,error) {
+	db:= infrastructure.GetDB()
+	var err error
+	if err := db.Create(&dto.Emotion{Diaryid:input.Diaryid,Happy: input.Happy,Angry: input.Angry,Surprise:input.Surprise,Sad: input.Sad,Fear: input.Fear}).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("followe err:%v\n", err)
+	}
+	return &model.Emotion{
+		Diaryid:input.Diaryid,
+		Happy: input.Happy,
+		Angry: input.Angry,
+		Surprise:input.Surprise,
+		Sad: input.Sad,
+		Fear: input.Fear ,
 	}, err
 }

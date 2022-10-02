@@ -21,11 +21,11 @@ func Init() *gorm.DB {
 	if err != nil {
 		fmt.Printf("読み込み出来ませんでした: %v", err)
 	} 
-	db, err := gorm.Open(mysql.Open(os.Getenv("DSN")), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(os.Getenv("DSN")), &gorm.Config{})
 	return db
 }
 
 func GetDB() *gorm.DB {
-return db
+	return db
 }
  

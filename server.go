@@ -3,17 +3,25 @@ package main
 import (
 	"net/http"
 
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi"
+	"github.com/gorilla/websocket"
+	"github.com/rs/cors"
 	"hackz.com/m/v2/graph"
 	"hackz.com/m/v2/graph/generated"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/go-chi/chi"
-	"github.com/rs/cors"
-	"github.com/gorilla/websocket"
-	"github.com/99designs/gqlgen/graphql/playground"
+	"hackz.com/m/v2/infrastructure"
 )
 
 func main() {
+	v2_db := infrastructure.Init()
+	db,err := v2_db.DB()
+	if err != nil {
+		
+	}
+	defer db.Close()
+
 	router := chi.NewRouter()
 
 	// Add CORS middleware around every request
@@ -39,7 +47,7 @@ func main() {
 	router.Handle("/", playground.Handler("Starwars", "/query"))
 	router.Handle("/query", srv)
 
-	err := http.ListenAndServe(":8080", router)
+	err = http.ListenAndServe(":8080", router)
 	if err != nil {
 		panic(err)
 	}

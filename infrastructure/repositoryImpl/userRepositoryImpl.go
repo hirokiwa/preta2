@@ -21,7 +21,7 @@ func (repositoryImpl *UserRepositoryImpl) Findfollowee(followeeid string)([]*mod
 	var err error
 	var follow []*dto.Follow = []*dto.Follow{}
 	var user []*model.User = []*model.User{}
-	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.follower = users.userid").Where("follows.followee = ?", userid).Scan(&user).Error; err != nil {
+	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.follower = users.userid").Where("follows.followee = ?", followeeid).Scan(&user).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
@@ -34,7 +34,7 @@ func (repositoryImpl *UserRepositoryImpl) Findfollower(followerid string)([]*mod
 	var err error
 	var follow []*dto.Follow = []*dto.Follow{}
 	var user []*model.User = []*model.User{}
-	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.followee = users.userid").Where("follows.follower = ?", userid).Scan(&user).Error; err != nil {
+	if err := db.Model(&follow).Select("*").Joins("inner join `users` on follows.followee = users.userid").Where("follows.follower = ?", followerid).Scan(&user).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
@@ -56,7 +56,7 @@ func (repositoryImpl *UserRepositoryImpl) FindUser(followerid string)(*model.Use
 func (repositoryImpl *UserRepositoryImpl) CreateUser(input model.NewUser)(*model.User,error){
 	db := infrastructure.GetDB()
 	var err error
-	if err := db.Create(&gormmodel.User{Userid: input.Userid, Name: input.Name}).Error; err != nil {
+	if err := db.Create(&dto.User{Userid: input.Userid, Name: input.Name}).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("user create Error!!!! err:%v\n", err)
 		return &model.User{
@@ -68,5 +68,46 @@ func (repositoryImpl *UserRepositoryImpl) CreateUser(input model.NewUser)(*model
 	return &model.User{
 		Userid: input.Userid,
 		Name:   input.Name,
+	}, err
+}
+
+func (repositoryImpl *UserRepositoryImpl) CreateFollow(input model.NewFollow)(*model.User,error) {
+	db := infrastructure.GetDB()
+	var err error
+
+	var folllower = &dto.User{}
+
+	if err := db.First(&folllower, "userid=?", input.Follower).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("follower user Notfound:%v\n", err)
+		return &model.User{
+			Userid: input.Follower,
+			Name:   folllower.Name,
+		}, err
+	}
+
+	var folllowee = &dto.User{}
+
+	if err := db.First(&folllowee, "userid=?", input.Followee).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("followee user Notfound:%v\n", err)
+		return &model.User{
+			Userid: input.Follower,
+			Name:   folllower.Name,
+		}, err
+	}
+
+	if err := db.Create(&dto.Follow{Followee: input.Followee, Follower: input.Follower}).Error; err != nil {
+		//エラーハンドリング
+		fmt.Printf("followe err:%v\n", err)
+		return &model.User{
+			Userid: input.Follower,
+			Name:   folllower.Name,
+		}, err
+	}
+
+	return &model.User{
+		Userid: input.Follower,
+		Name:   folllower.Name,
 	}, err
 }

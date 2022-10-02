@@ -7,8 +7,9 @@ import (
 type UserRepository interface {
 	Findfollowee(followerid string)([]*model.User,error)
 	Findfollower(followeeid string)([]*model.User,error)
-	FindUser(userid string)(*model.User)
-	CreateUser(input model.NewUser)(*model.User)
+	FindUser(userid string)(*model.User,error)
+	CreateUser(input model.NewUser)(*model.User,error)
+	CreateFollow(input model.NewFollow)(*model.User,error)
 }
 
 

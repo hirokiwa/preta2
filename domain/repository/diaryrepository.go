@@ -8,4 +8,5 @@ import (
 type DiaryRepository interface{
 	FindDiary(userid string)([]*model.Diary,error)
 	CreateDiary(input model.NewDiary )(*model.Diary,error)
+	CreateEmotion(input model.NewEmotion)(*model.Emotion,error)
 }
