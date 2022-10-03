@@ -25,7 +25,7 @@ func (repositoryImpl *DiaryRepositoryImpl) FindDiary(userid string)([]*model.Dia
 	var GormDiaries []*dto.Diary = []*dto.Diary{}
 	var GormDiaryandEmotion []*dto.DiaryandEmotion = []*dto.DiaryandEmotion{}
 
-	if err := db.Model(&GormDiaries).Select("*").Where("diaries.userid=?",userid).Joins("inner join `emotions` on diaries.diaryid = emotions.diaryid").Joins("inner join `users` on diaries.userid = users.userid").Joins("inner join `englishes` on diaries.diaryid = englishes.diaryid").Order("diaries.created_at").Scan(&GormDiaryandEmotion).Error; err != nil {
+	if err := db.Model(GormDiaries).Select("*").Where("diaries.userid=?",userid).Joins("inner join `emotions` on diaries.diaryid = emotions.diaryid").Joins("inner join `users` on diaries.userid = users.userid").Joins("inner join `englishes` on diaries.diaryid = englishes.diaryid").Order("diaries.created_at").Scan(&GormDiaryandEmotion).Error; err != nil {
 		//エラーハンドリング
 		fmt.Printf("db select Error!!!! err:%v\n", err)
 	}
