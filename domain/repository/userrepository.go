@@ -10,6 +10,8 @@ type UserRepository interface {
 	FindUser(userid string)(*model.User,error)
 	CreateUser(input model.NewUser)(*model.User,error)
 	CreateFollow(input model.NewFollow)(*model.User,error)
+	FindFolloweeDiary(followerid string)([]*model.UserDiary,error)
+	FindFollowerDiary(followeeid string)([]*model.UserDiary,error)
 }
 
 

@@ -24,16 +24,7 @@ func NewGetFolloweeUseCaseImpl(Userid string,userrepository repository.UserRepos
 }
 
 func (impl getFolloweeDiaryUseCaseImpl) GetFolloweeDiary() ([]*model.UserDiary,error){
-	var UserDiaryList []*model.UserDiary  = []*model.UserDiary{}
-	Followee,err := impl.UserRepository.Findfollowee(impl.Userid)
-	for i := 0;i < len(Followee);i++{
-		Diary,err := impl.DiaryRepository.FindDiary(Followee[i].Userid)
-		if err  != nil{
-
-		}
-		var UserDiary *model.UserDiary = &model.UserDiary{Diary: Diary,User: Followee[i]}
-		UserDiaryList = append(UserDiaryList, UserDiary)
-	}
-	return UserDiaryList,err
+	FolloweeDiary,err := impl.UserRepository.FindFolloweeDiary(impl.Userid)
+	return FolloweeDiary,err
 
 }
