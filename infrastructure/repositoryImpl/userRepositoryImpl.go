@@ -125,10 +125,7 @@ func (reppsitoryImpl *UserRepositoryImpl) FindFolloweeDiary(followerid string) (
 	var i = 0
 	var userdiaryindex = 0
 	println(len(FolloweeDiary))
-
-
 	if (len(FolloweeDiary) == 0) {
-
 	} else {
 		for i = 0; i < len(FolloweeDiary); i++ {
 			if i > 0 {
@@ -141,10 +138,8 @@ func (reppsitoryImpl *UserRepositoryImpl) FindFolloweeDiary(followerid string) (
 							Name:   FolloweeDiary[i-1].Name,
 						},
 						Diary: Diary,
-	
 					})
 					userdiaryindex += 1
-					
 				}
 			}
 			Diary = append(Diary, &model.Diary{
@@ -183,7 +178,6 @@ func (reppsitoryImpl *UserRepositoryImpl) FindFolloweeDiary(followerid string) (
 	return UserDiary, err
 }
 
-
 func (reppsitoryImpl *UserRepositoryImpl) FindFollowerDiary(followeeid string) ([]*model.UserDiary, error) {
 	db := infrastructure.GetDB()
 	var FollowerDiary = []*dto.UserandDiary{}
@@ -198,10 +192,7 @@ func (reppsitoryImpl *UserRepositoryImpl) FindFollowerDiary(followeeid string) (
 	var i = 0
 	var userdiaryindex = 0
 	println(len(FollowerDiary))
-
-
 	if (len(FollowerDiary) == 0) {
-
 	} else {
 		for i = 0; i < len(FollowerDiary); i++ {
 			if i > 0 {
@@ -214,10 +205,8 @@ func (reppsitoryImpl *UserRepositoryImpl) FindFollowerDiary(followeeid string) (
 							Name:   FollowerDiary[i-1].Name,
 						},
 						Diary: Diary,
-	
 					})
 					userdiaryindex += 1
-					
 				}
 			}
 			Diary = append(Diary, &model.Diary{
