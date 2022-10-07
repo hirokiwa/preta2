@@ -3,43 +3,78 @@
 # https://gqlgen.com/getting-started/
 scalar Date
 
+"""
+Diaryに付属するテキストの感情
+"""
 type Emotion{
+  "絵日記に与えられる任意のID(int)"
   Diaryid: ID!
+  "幸福度(0...1)"
 	Happy: String!
+  "怒り(0...1)"
 	Angry: String!
+  "驚き(0...1)"
 	Surprise: String!
+  "悲しみ(0...1)"
 	Sad: String!
+  "恐れ(0...1)"
 	Fear: String!
+  "作られた日時(Datetime)"
 	CreatedAt: Date!
+  "最終更新日時(Datetime)"
   UpdatedAt: Date!
 }
 
+"""
+絵日記データ
+"""
 type Diary {
+  "絵日記に与えられる任意のID(int)"
   Diaryid: ID!
+  "絵日記のテキスト(japanese)"
   Word: String!
-  Imageurl:String!
-  User: User!
-  Emotion: Emotion!
+  "絵日記のテキスト(English)"
   Englishword: String!
+  "絵日記画像URL"
+  Imageurl:String!
+  "絵日記投稿ユーザ情報"
+  User: User!
+  "絵日記の感情"
+  Emotion: Emotion!
+  "作られた日時(Datetime)"
   CreatedAt: Date!
+  "最終更新日時(Datetime)"
 	UpdatedAt: Date!
 }
 
+"""
+とあるユーザとそのユーザの絵日記全て
+"""
 type UserDiary{
   User:User
   Diary: [Diary!]!
 }
 
-
+"""
+ユーザ情報
+"""
 type User{
   Userid: ID!
   Name: String!
 }
 
+
+"""
+登録されているユーザの全ての情報
+"""
 type Me {
+  "ユーザ情報"
   User:User!
+  "ユーザの絵日記情報"
   Diary:[Diary!]!
+  "フォローしているユーザ情報"
   Followee:[UserDiary!]!
+  "フォローされているユーザ情報"
   Follower:[UserDiary!]!
 }
 

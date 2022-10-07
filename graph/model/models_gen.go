@@ -2,32 +2,55 @@
 
 package model
 
+// 絵日記データ
 type Diary struct {
-	Diaryid     string   `json:"Diaryid"`
-	Word        string   `json:"Word"`
-	Imageurl    string   `json:"Imageurl"`
-	User        *User    `json:"User"`
-	Emotion     *Emotion `json:"Emotion"`
-	Englishword string   `json:"Englishword"`
-	CreatedAt   string   `json:"CreatedAt"`
-	UpdatedAt   string   `json:"UpdatedAt"`
-}
-
-type Emotion struct {
-	Diaryid   string `json:"Diaryid"`
-	Happy     string `json:"Happy"`
-	Angry     string `json:"Angry"`
-	Surprise  string `json:"Surprise"`
-	Sad       string `json:"Sad"`
-	Fear      string `json:"Fear"`
+	// 絵日記に与えられる任意のID(int)
+	Diaryid string `json:"Diaryid"`
+	// 絵日記のテキスト(japanese)
+	Word string `json:"Word"`
+	// 絵日記のテキスト(English)
+	Englishword string `json:"Englishword"`
+	// 絵日記画像URL
+	Imageurl string `json:"Imageurl"`
+	// 絵日記投稿ユーザ情報
+	User *User `json:"User"`
+	// 絵日記の感情
+	Emotion *Emotion `json:"Emotion"`
+	// 作られた日時(Datetime)
 	CreatedAt string `json:"CreatedAt"`
+	// 最終更新日時(Datetime)
 	UpdatedAt string `json:"UpdatedAt"`
 }
 
+// Diaryに付属するテキストの感情
+type Emotion struct {
+	// 絵日記に与えられる任意のID(int)
+	Diaryid string `json:"Diaryid"`
+	// 幸福度(0...1)
+	Happy string `json:"Happy"`
+	// 怒り(0...1)
+	Angry string `json:"Angry"`
+	// 驚き(0...1)
+	Surprise string `json:"Surprise"`
+	// 悲しみ(0...1)
+	Sad string `json:"Sad"`
+	// 恐れ(0...1)
+	Fear string `json:"Fear"`
+	// 作られた日時(Datetime)
+	CreatedAt string `json:"CreatedAt"`
+	// 最終更新日時(Datetime)
+	UpdatedAt string `json:"UpdatedAt"`
+}
+
+// 登録されているユーザの全ての情報
 type Me struct {
-	User     *User        `json:"User"`
-	Diary    []*Diary     `json:"Diary"`
+	// ユーザ情報
+	User *User `json:"User"`
+	// ユーザの絵日記情報
+	Diary []*Diary `json:"Diary"`
+	// フォローしているユーザ情報
 	Followee []*UserDiary `json:"Followee"`
+	// フォローされているユーザ情報
 	Follower []*UserDiary `json:"Follower"`
 }
 
@@ -57,11 +80,13 @@ type NewUser struct {
 	Name   string `json:"Name"`
 }
 
+// ユーザ情報
 type User struct {
 	Userid string `json:"Userid"`
 	Name   string `json:"Name"`
 }
 
+// とあるユーザとそのユーザの絵日記全て
 type UserDiary struct {
 	User  *User    `json:"User"`
 	Diary []*Diary `json:"Diary"`

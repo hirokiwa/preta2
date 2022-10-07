@@ -434,43 +434,78 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 scalar Date
 
+"""
+Diaryに付属するテキストの感情
+"""
 type Emotion{
+  "絵日記に与えられる任意のID(int)"
   Diaryid: ID!
+  "幸福度(0...1)"
 	Happy: String!
+  "怒り(0...1)"
 	Angry: String!
+  "驚き(0...1)"
 	Surprise: String!
+  "悲しみ(0...1)"
 	Sad: String!
+  "恐れ(0...1)"
 	Fear: String!
+  "作られた日時(Datetime)"
 	CreatedAt: Date!
+  "最終更新日時(Datetime)"
   UpdatedAt: Date!
 }
 
+"""
+絵日記データ
+"""
 type Diary {
+  "絵日記に与えられる任意のID(int)"
   Diaryid: ID!
+  "絵日記のテキスト(japanese)"
   Word: String!
-  Imageurl:String!
-  User: User!
-  Emotion: Emotion!
+  "絵日記のテキスト(English)"
   Englishword: String!
+  "絵日記画像URL"
+  Imageurl:String!
+  "絵日記投稿ユーザ情報"
+  User: User!
+  "絵日記の感情"
+  Emotion: Emotion!
+  "作られた日時(Datetime)"
   CreatedAt: Date!
+  "最終更新日時(Datetime)"
 	UpdatedAt: Date!
 }
 
+"""
+とあるユーザとそのユーザの絵日記全て
+"""
 type UserDiary{
   User:User
   Diary: [Diary!]!
 }
 
-
+"""
+ユーザ情報
+"""
 type User{
   Userid: ID!
   Name: String!
 }
 
+
+"""
+登録されているユーザの全ての情報
+"""
 type Me {
+  "ユーザ情報"
   User:User!
+  "ユーザの絵日記情報"
   Diary:[Diary!]!
+  "フォローしているユーザ情報"
   Followee:[UserDiary!]!
+  "フォローされているユーザ情報"
   Follower:[UserDiary!]!
 }
 
@@ -735,6 +770,50 @@ func (ec *executionContext) fieldContext_Diary_Word(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Diary_Englishword(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Diary_Englishword(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Englishword, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Diary_Englishword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Diary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Diary_Imageurl(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Diary_Imageurl(ctx, field)
 	if err != nil {
@@ -886,50 +965,6 @@ func (ec *executionContext) fieldContext_Diary_Emotion(ctx context.Context, fiel
 				return ec.fieldContext_Emotion_UpdatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Emotion", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Diary_Englishword(ctx context.Context, field graphql.CollectedField, obj *model.Diary) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Diary_Englishword(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Englishword, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Diary_Englishword(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Diary",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1468,14 +1503,14 @@ func (ec *executionContext) fieldContext_Me_Diary(ctx context.Context, field gra
 				return ec.fieldContext_Diary_Diaryid(ctx, field)
 			case "Word":
 				return ec.fieldContext_Diary_Word(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
 			case "User":
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
-			case "Englishword":
-				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1630,14 +1665,14 @@ func (ec *executionContext) fieldContext_Mutation_createDiary(ctx context.Contex
 				return ec.fieldContext_Diary_Diaryid(ctx, field)
 			case "Word":
 				return ec.fieldContext_Diary_Word(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
 			case "User":
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
-			case "Englishword":
-				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -1963,14 +1998,14 @@ func (ec *executionContext) fieldContext_Query_AllDiary(ctx context.Context, fie
 				return ec.fieldContext_Diary_Diaryid(ctx, field)
 			case "Word":
 				return ec.fieldContext_Diary_Word(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
 			case "User":
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
-			case "Englishword":
-				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -2289,14 +2324,14 @@ func (ec *executionContext) fieldContext_UserDiary_Diary(ctx context.Context, fi
 				return ec.fieldContext_Diary_Diaryid(ctx, field)
 			case "Word":
 				return ec.fieldContext_Diary_Word(ctx, field)
+			case "Englishword":
+				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "Imageurl":
 				return ec.fieldContext_Diary_Imageurl(ctx, field)
 			case "User":
 				return ec.fieldContext_Diary_User(ctx, field)
 			case "Emotion":
 				return ec.fieldContext_Diary_Emotion(ctx, field)
-			case "Englishword":
-				return ec.fieldContext_Diary_Englishword(ctx, field)
 			case "CreatedAt":
 				return ec.fieldContext_Diary_CreatedAt(ctx, field)
 			case "UpdatedAt":
@@ -4305,6 +4340,13 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "Englishword":
+
+			out.Values[i] = ec._Diary_Englishword(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "Imageurl":
 
 			out.Values[i] = ec._Diary_Imageurl(ctx, field, obj)
@@ -4322,13 +4364,6 @@ func (ec *executionContext) _Diary(ctx context.Context, sel ast.SelectionSet, ob
 		case "Emotion":
 
 			out.Values[i] = ec._Diary_Emotion(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "Englishword":
-
-			out.Values[i] = ec._Diary_Englishword(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
